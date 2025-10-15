@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <title>Echo - Self-Journaling</title>
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkVjaG8gLSBTZWxmLUpvdXJuYWxpbmciLAogICJzaG9ydF9uYW1lIjogIkVjaG8iLAogICJkZXNjcmlwdGlvbiI6ICJBIG1pbmltYWxpc3Qgc2VsZi1qb3VybmFsaW5nIGFwcCBmb3IgZGFpbHkgcmVmbGVjdGlvbiIsCiAgInN0YXJ0X3VybCI6ICIvIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDAwMDAwIiwKICAidGhlbWVfY29sb3IiOiAiIzAwMDAwMCIsCiAgImljb25zIjogW10KfQ==">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+    
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-header">
+            <h3>Settings</h3>
+            <button class="close-menu" onclick="closeMobileMenu()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <button class="mobile-menu-btn" onclick="requestNotificationPermission(); closeMobileMenu();">
+            <i class="fas fa-bell"></i>
+            <span>Enable Notifications</span>
+        </button>
+        
+        <button class="mobile-menu-btn" onclick="toggleTheme(); closeMobileMenu();">
+            <i class="fas fa-sun"></i>
+            <span>Toggle Theme</span>
+        </button>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-mirror"></i> Echo</h1>
+            <button class="hamburger" onclick="openMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="controls">
+                <button class="notif-btn" onclick="requestNotificationPermission()">
+                    <i class="fas fa-bell"></i> Enable Notifications
+                </button>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="fas fa-sun"></i> Toggle Theme
+                </button>
+            </div>
+        </header>
+
+        <nav class="desktop-nav">
+            <button class="nav-btn active" onclick="showSection('journal')">
+                <i class="fas fa-moon"></i> Night Journal
+            </button>
+            <button class="nav-btn" onclick="showSection('morning')">
+                <i class="fas fa-list-check"></i> To-Do
+            </button>
+            <button class="nav-btn" onclick="showSection('calendar')">
+                <i class="fas fa-calendar-alt"></i> Calendar
+            </button>
+            <button class="nav-btn" onclick="showSection('goals')">
+                <i class="fas fa-bullseye"></i> Goals
+            </button>
+        </nav>
+
+        <!-- Journal Section -->
+        <div id="journal" class="section active">
+            <div class="card">
+                <h2><i class="fas fa-moon"></i> Evening Reflection</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 14px;">Take a moment to reflect on your day...</p>
+
+                <div class="question-block">
+                    <h3>1. What did I do today that truly mattered?</h3>
+                    <textarea id="journal1" placeholder="Your thoughts..."></textarea>
+                </div>
+
+                <div class="question-block">
+                    <h3>2. What weight am I carrying that I don't need to?</h3>
+                    <textarea id="journal2" placeholder="Your thoughts..."></textarea>
+                </div>
+
+                <div class="question-block">
+                    <h3>3. If tomorrow didn't exist, would I be proud of myself today?</h3>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="q3" value="yes"> Yes</label>
+                        <label class="radio-label"><input type="radio" name="q3" value="no"> No</label>
+                    </div>
+                    <textarea id="journal3" placeholder="Why or why not?"></textarea>
+                </div>
+
+                <button class="btn-primary" onclick="saveJournal()">
+                    <i class="fas fa-save"></i> Save Journal
+                </button>
+                <div id="journal-status"></div>
+            </div>
+        </div>
+
+        <!-- To-Do Section -->
+        <div id="morning" class="section">
+            <div class="card">
+                <h2><i class="fas fa-list-check"></i> To-Do List</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 14px;">Organize your tasks and stay productive</p>
+
+                <div class="todo-input-group">
+                    <input type="text" class="todo-input" id="todo-input" placeholder="Add a new task..." 
+                           onkeypress="if(event.key==='Enter') addTodo()">
+                    <button class="btn-primary" onclick="addTodo()" style="width: auto; padding: 12px 20px;">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+
+                <ul class="todo-list" id="todo-list"></ul>
+                
+                <div style="margin-top: 20px; padding: 12px; background: var(--bg-dark); border-radius: 6px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <span style="color: var(--text-secondary); font-size: 13px;">
+                        <i class="fas fa-chart-line"></i> Progress: <strong id="todo-progress">0/0</strong>
+                    </span>
+                    <button class="delete-btn" onclick="clearCompleted()" style="background: var(--accent-yellow); padding: 6px 12px; font-size: 12px;">
+                        <i class="fas fa-broom"></i> Clear Completed
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div id="calendar" class="section">
+            <div class="card">
+                <h2><i class="fas fa-calendar-alt"></i> Your Journey</h2>
+                <div class="calendar-controls">
+                    <button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                    <h3 id="current-month"></h3>
+                    <button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="calendar-grid" id="calendar-grid"></div>
+                <div id="entry-view" class="entry-view" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Goals Section -->
+        <div id="goals" class="section">
+            <div class="card">
+                <h2><i class="fas fa-bullseye"></i> Goals & Milestones</h2>
+                
+                <h3>Weekly Goal</h3>
+                <div class="goal-input-group">
+                    <input type="text" id="weekly-goal-text" placeholder="What's your goal this week?">
+                    <input type="date" id="weekly-goal-date">
+                    <button class="btn-primary" onclick="addGoal('weekly')">
+                        <i class="fas fa-plus"></i> Set Weekly Goal
+                    </button>
+                </div>
+
+                <h3>Monthly Goal</h3>
+                <div class="goal-input-group">
+                    <input type="text" id="monthly-goal-text" placeholder="What's your goal this month?">
+                    <input type="date" id="monthly-goal-date">
+                    <button class="btn-primary" onclick="addGoal('monthly')">
+                        <i class="fas fa-plus"></i> Set Monthly Goal
+                    </button>
+                </div>
+
+                <h3 style="margin-top: 30px;">Active Goals</h3>
+                <ul class="goal-list" id="goal-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-grid">
+            <button class="mobile-nav-btn active" onclick="showSectionMobile('journal')">
+                <i class="fas fa-moon"></i>
+                <span>Journal</span>
+            </button>
+            <button class="mobile-nav-btn" onclick="showSectionMobile('morning')">
+                <i class="fas fa-list-check"></i>
+                <span>To-Do</span>
+            </button>
+            <button class="mobile-nav-btn" onclick="showSectionMobile('calendar')">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Calendar</span>
+            </button>
+            <button class="mobile-nav-btn" onclick="showSectionMobile('goals')">
+                <i class="fas fa-bullseye"></i>
+                <span>Goals</span>
+            </button>
+        </div>
+    </nav>
+
+    <script src="script.js"></script>
+</body>
+</html>
