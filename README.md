@@ -354,14 +354,6 @@ Echo was created to address the need for a simple, privacy-focused journaling to
 
 ---
 
-## 📞 Contact
-
-- **Project Link**: [https://github.com/yourusername/echo-journal](https://github.com/yourusername/echo-journal)
-- **Report Issues**: [https://github.com/yourusername/echo-journal/issues](https://github.com/yourusername/echo-journal/issues)
-- **Discussions**: [https://github.com/yourusername/echo-journal/discussions](https://github.com/yourusername/echo-journal/discussions)
-
----
-
 ## ⭐ Show Your Support
 
 If you find Echo helpful, please consider:
